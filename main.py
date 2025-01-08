@@ -11,7 +11,7 @@ import tweepy
 from elevenlabs import generate, play, set_api_key
 from langchain.agents import initialize_agent, load_tools
 from langchain.agents.agent_toolkits import ZapierToolkit
-from langchain.llms import OpenAI
+from langchain_openai import OpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.tools import BaseTool
 from langchain.utilities.zapier import ZapierNLAWrapper
