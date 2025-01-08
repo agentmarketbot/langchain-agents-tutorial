@@ -17,8 +17,17 @@ from langchain.tools import BaseTool
 from langchain.utilities.zapier import ZapierNLAWrapper
 
 
-set_api_key("<11LABS_API_KEY>")
-openai.api_key = "<OPENAI_API_KEY>"
+from dotenv import load_dotenv
+load_dotenv()
+
+elevenlabs_api_key = os.getenv('ELEVENLABS_API_KEY')
+if not elevenlabs_api_key:
+    raise ValueError("Please set ELEVENLABS_API_KEY environment variable")
+set_api_key(elevenlabs_api_key)
+
+openai.api_key = os.getenv('OPENAI_API_KEY')
+if not openai.api_key:
+    raise ValueError("Please set OPENAI_API_KEY environment variable")
 
 # Set recording parameters
 duration = 5  # duration of each recording in seconds
@@ -49,16 +58,19 @@ def play_generated_audio(text, voice="Bella", model="eleven_monolingual_v1"):
     play(audio)
 
 
-# Replace with your API keys
-consumer_key = "<CONSUMER_KEY>"
-consumer_secret = "<CONSUMER_SECRET>"
-access_token = "<ACCESS_TOKEN>"
-access_token_secret = "<ACCESS_TOKEN_SECRET>"
+# Get Twitter API credentials from environment variables
+consumer_key = os.getenv('TWITTER_CONSUMER_KEY')
+consumer_secret = os.getenv('TWITTER_CONSUMER_SECRET')
+access_token = os.getenv('TWITTER_ACCESS_TOKEN')
+access_token_secret = os.getenv('TWITTER_ACCESS_TOKEN_SECRET')
 
-client = tweepy.Client(
-    consumer_key=consumer_key, consumer_secret=consumer_secret,
-    access_token=access_token, access_token_secret=access_token_secret
-)
+if all([consumer_key, consumer_secret, access_token, access_token_secret]):
+    client = tweepy.Client(
+        consumer_key=consumer_key, consumer_secret=consumer_secret,
+        access_token=access_token, access_token_secret=access_token_secret
+    )
+else:
+    print("Warning: Twitter API credentials not fully configured. Twitter posting will not be available.")
 
 
 class TweeterPostTool(BaseTool):
@@ -79,12 +91,21 @@ if __name__ == '__main__':
     llm = OpenAI(temperature=0)
     memory = ConversationBufferMemory(memory_key="chat_history")
 
-    zapier = ZapierNLAWrapper(zapier_nla_api_key="<ZAPIER_NLA_API_KEY>")
-    toolkit = ZapierToolkit.from_zapier_nla_wrapper(zapier)
+    zapier_api_key = os.getenv('ZAPIER_NLA_API_KEY')
+    if zapier_api_key:
+        zapier = ZapierNLAWrapper(zapier_nla_api_key=zapier_api_key)
+        toolkit = ZapierToolkit.from_zapier_nla_wrapper(zapier)
+        tools = toolkit.get_tools()
+    else:
+        print("Warning: Zapier NLA API key not configured. Zapier integration will not be available.")
+        tools = []
 
-    # tools = [TweeterPostTool()] + toolkit.get_tools() + load_tools(["human"])
+    # Add Twitter tool if credentials are configured
+    if all([consumer_key, consumer_secret, access_token, access_token_secret]):
+        tools.append(TweeterPostTool())
 
-    tools = toolkit.get_tools() + load_tools(["human"])
+    # Always add human tools
+    tools.extend(load_tools(["human"]))
 
     agent = initialize_agent(tools, llm, memory=memory, agent="conversational-react-description", verbose=True)
 
