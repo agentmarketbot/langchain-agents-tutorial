@@ -25,28 +25,33 @@ You need to obtain API keys for the following services:
 1. Twitter Developer Account (for Tweepy)
 2. OpenAI API key
 3. Zapier NLA API key
+4. ElevenLabs API key
 
-Replace the placeholders in the code with the respective API keys:
+Copy the `.env.example` file to `.env` and fill in your API keys:
 
-```python
-consumer_key = "<CONSUMER_KEY>"
-consumer_secret = "<CONSUMER_SECRET>"
-access_token = "<ACCESS_TOKEN>"
-access_token_secret = "<ACCESS_TOKEN_SECRET>"
+```bash
+OPENAI_API_KEY=your_openai_api_key_here
+ELEVENLABS_API_KEY=your_elevenlabs_api_key_here
+TWITTER_CONSUMER_KEY=your_twitter_consumer_key_here
+TWITTER_CONSUMER_SECRET=your_twitter_consumer_secret_here
+TWITTER_ACCESS_TOKEN=your_twitter_access_token_here
+TWITTER_ACCESS_TOKEN_SECRET=your_twitter_access_token_secret_here
+ZAPIER_NLA_API_KEY=your_zapier_api_key_here
 ```
 
-```python
-set_api_key("<11LABS_API_KEY>")
-openai.api_key = "<OPENAI_API_KEY>"
-```
+Replace `your_*_api_key_here` with your actual API keys.
 
-```python
-zapier = ZapierNLAWrapper(zapier_nla_api_key="<ZAPIER_NLA_API_KEY>")
-```
+**Important**: 
+1. Never commit your API keys to version control. The `.env` file is already in `.gitignore` to prevent accidental commits.
+2. If you see an error like "Did not find openai_api_key", it means your environment variables are not properly set. Make sure you've created the `.env` file and filled in all the required API keys.
 
 ## Running the program
 
-1. Save the provided code in a file named `main.py`.
+1. Copy the example environment file and fill in your API keys:
+```bash
+cp .env.example .env
+# Edit .env with your actual API keys
+```
 2. Open a terminal or command prompt and navigate to the folder containing `main.py`.
 3. Run the program using the following command:
 
